@@ -1,0 +1,378 @@
+{
+  "name": "FINC-Gravar no banco",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3360,
+        32
+      ],
+      "id": "b27abf3e-e382-4ed2-8329-c893f38f43e2",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "DmvDsDAnQzjdDuAU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64d0d01b-0fa3-42da-b1cb-bd886a62c07c",
+              "name": "chatid",
+              "value": "={{ $json.chatId }}",
+              "type": "string"
+            },
+            {
+              "id": "30399be6-f6b6-407b-9637-e5b1bc28c7e3",
+              "name": "estabelecimento",
+              "value": "={{ $json.estabelecimento }}",
+              "type": "string"
+            },
+            {
+              "id": "10f38f85-dcdc-408a-b605-31eaba9293c9",
+              "name": "data",
+              "value": "={{ $json.quando }}",
+              "type": "string"
+            },
+            {
+              "id": "3d119556-73ca-4a46-9411-e596a96d4b65",
+              "name": "valorTotal",
+              "value": "={{ $json.valorTotal }}",
+              "type": "string"
+            },
+            {
+              "id": "75a8fbd2-aec4-4ea3-a071-c01615c4ae67",
+              "name": "detalhes",
+              "value": "={{ $json.detalhes }}",
+              "type": "string"
+            },
+            {
+              "id": "a1a3bb63-3dca-4c96-9927-a4eaac858e1e",
+              "name": "tipo",
+              "value": "={{ $json.tipo }}",
+              "type": "string"
+            },
+            {
+              "id": "402d9805-3738-4b97-816d-10c0cf669dc7",
+              "name": "categoria",
+              "value": "={{ $json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "8ac3a201-8137-4296-b5ad-2f99c44508af",
+              "name": "documentId",
+              "value": "={{ $json.documentId }}",
+              "type": "string"
+            },
+            {
+              "id": "4926512f-4b88-4069-b18e-037d0cd29ea4",
+              "name": "idApp",
+              "value": "={{ $json.idApp }}",
+              "type": "string"
+            },
+            {
+              "id": "65aae7db-510a-45fe-b4e2-e6081a7cb30e",
+              "name": "notificado",
+              "value": false,
+              "type": "string"
+            },
+            {
+              "id": "3f4521e2-bce3-4e7c-860b-36f5b36580a2",
+              "name": "categoryId",
+              "value": "={{ $json.categoryId }}",
+              "type": "string"
+            },
+            {
+              "id": "68db5237-6f82-405d-9f1d-7e9a3161b22f",
+              "name": "isPending",
+              "value": false,
+              "type": "string"
+            },
+            {
+              "id": "7e680c20-e7fd-4d96-8ed0-d590c74d26fd",
+              "name": "visualizado",
+              "value": "false",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2496,
+        -160
+      ],
+      "id": "c1e4887c-ee60-436a-9c5f-1881390849b4",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "create",
+        "projectId": "expense-tracker-5a578",
+        "collection": "n8n-analise-lançamento",
+        "documentId": "={{ $json.documentId }}",
+        "columns": "=chatid,\nestabelecimento,\ndata,\nvalorTotal,\ndetalhes,\ntipo,\ncategoria,\nidApp,\ncategoryId,\nisPending,\nnotificado",
+        "simple": "={{ $json.chatid }}, {{ $json.estabelecimento }},{{ $json.data }},{{ $json.valorTotal }},{{ $json.detalhes }},{{ $json.tipo }},{{ $json.categoria }}{{ $json.idApp }},{{ $json.notificado }}, {{ $json.categoryId }},{{ $json.isPending }}"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        2960,
+        -160
+      ],
+      "id": "7e4a7099-82ff-40bb-ae25-59d4f62286f7",
+      "name": "Create a document",
+      "credentials": {
+        "googleApi": {
+          "id": "o1J5zvqDKdzfFkIJ",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('Start').item.json.body_session }}",
+        "chatId": "={{ $('Start').item.json.body_payload__data_Info_Chat }}",
+        "text": "={{ $json.text }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-waha.WAHA",
+      "typeVersion": 202411,
+      "position": [
+        3792,
+        -160
+      ],
+      "id": "61211184-81a1-4221-a497-0881f37cd103",
+      "name": "Send a text message2",
+      "credentials": {
+        "wahaApi": {
+          "id": "yt0c30cNDC5FS5ax",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Crie uma mensagem de até ate 500 caracteres, informado detalhes da compra e que foi\nregistrada com quebra de linha entre os itens e emoji!\n\n*DADOS DA COMPRA*\nquando: {{ $('Edit Fields2').item.json.data }}\nonde: {{ $json.estabelecimento }}\nvalor: {{ $('Edit Fields2').item.json.valorTotal }}\ndetalhes: {{ $json.detalhes }}\ncategoria: {{ $json.categoria }}\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        3296,
+        -160
+      ],
+      "id": "7167d597-1736-442a-9928-133d763a664b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatId",
+              "type": "any"
+            },
+            {
+              "name": "estabelecimento",
+              "type": "any"
+            },
+            {
+              "name": "quando",
+              "type": "any"
+            },
+            {
+              "name": "valorTotal",
+              "type": "any"
+            },
+            {
+              "name": "detalhes",
+              "type": "any"
+            },
+            {
+              "name": "tipo",
+              "type": "any"
+            },
+            {
+              "name": "categoria",
+              "type": "any"
+            },
+            {
+              "name": "documentId",
+              "type": "any"
+            },
+            {
+              "name": "body_session",
+              "type": "any"
+            },
+            {
+              "name": "body_payload__data_Info_Chat",
+              "type": "any"
+            },
+            {
+              "name": "idApp",
+              "type": "any"
+            },
+            {
+              "name": "categoryId"
+            },
+            {
+              "name": "isPending",
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "id": "1fbc338b-6b54-4845-929d-06321a63904c",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        2288,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "create",
+        "projectId": "expense-tracker-5a578",
+        "collection": "notificacao",
+        "documentId": "={{ $json.notificaId }}",
+        "columns": "idApp,\ndocumentId,\nvalorTotal,\ntipo,\ndetalhes,\nvisualizado, \ndataLancamento",
+        "simple": "={{ $json.idApp }}, \n{{ $json.documentId }}, \n{{ $json.valorTotal }}, \n{{ $json.tipo }}, \n{{ $('Edit Fields2').item.json.detalhes }},\n{{ $json.visualizado }},\n{{ $json.dataLancamento }}"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        3072,
+        64
+      ],
+      "id": "3c73aa5b-bc3a-40d0-9d87-f2ab3bfb2f64",
+      "name": "Create a document1",
+      "credentials": {
+        "googleApi": {
+          "id": "o1J5zvqDKdzfFkIJ",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Função para gerar UUID v4\nfunction uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    const r = Math.random() * 16 | 0;\n    const v = c === 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\n\n// Adiciona o UUID e a data de lançamento ao item\nreturn [\n  {\n    json: {\n      ...$json,\n      notificaId: uuidv4(),                 // novo campo com UUID\n      dataLancamento: new Date().toISOString(), // novo campo com a data de lançamento                 // novo campo booleano\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        64
+      ],
+      "id": "265c6112-2f4e-494d-8cff-7d739dbc85dc",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Create a document",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        []
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a document1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "99e1f712-cc68-428b-b203-a431538cce8d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "13825b14251b4523b4c6c696ee1fd35cf65637f37ebb80ccdb31ad8ffd57e3e2"
+  },
+  "id": "b2NxPkInbzsMMJ7q",
+  "tags": []
+}

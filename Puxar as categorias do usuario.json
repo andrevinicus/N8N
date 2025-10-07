@@ -1,0 +1,199 @@
+{
+  "name": "Puxar as categorias do usuario",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "getAll",
+        "projectId": "expense-tracker-5a578",
+        "collection": "categories",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        -336
+      ],
+      "id": "45100c69-9fe4-4b87-92f5-43063de42a74",
+      "name": "Get many documents",
+      "credentials": {
+        "googleApi": {
+          "id": "o1J5zvqDKdzfFkIJ",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3fa58de-1211-4998-a30b-0857f4c983f7",
+              "name": "categoryId",
+              "value": "={{ $json.categoryId }}",
+              "type": "string"
+            },
+            {
+              "id": "145580c6-3795-4d0f-87e7-b8d3dbdba894",
+              "name": "userId",
+              "value": "={{ $json.userId }}",
+              "type": "string"
+            },
+            {
+              "id": "fe4405cc-9097-4c8c-a9b9-4c94b8653955",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "87a2554c-90bd-4c54-aaed-7200f0a1fbd6",
+              "name": "id",
+              "value": "={{ $('Start').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8b4f7efc-894e-478f-8924-2c9509567df7",
+              "name": "type",
+              "value": "={{ $json.type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        -336
+      ],
+      "id": "7c0a7f12-d4ab-44f3-b0fb-c9644af8f97d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "83af8799-11ba-42f7-be9b-7619a55b684a",
+              "leftValue": "={{ $json.userId }}",
+              "rightValue": "={{ $json.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        -336
+      ],
+      "id": "f4f4bdf4-77d1-4c26-8248-0ef147e339ba",
+      "name": "Compara userID"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega todas as categorias filtradas do usuário\nconst categoriasFiltradas = $input.all().map(item => item.json);\n\n// Cria uma lista no formato \"Nome (categoryId)\" para cada categoria\nconst listaCategorias = categoriasFiltradas\n    .map(cat => `${cat.name} (Tipo:${cat.type}) (${cat.categoryId})`)\n    .join(\", \");\n\n// Retorna no formato que pode ser injetado no prompt\nreturn [{ json: { categoriasPrompt: listaCategorias } }];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -336
+      ],
+      "id": "4274cb7a-f87b-48e5-acc6-e2ff80a8bd40",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "d849e909-066a-4fab-bd23-7fa2ed548d7c",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -192,
+        -336
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many documents": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Compara userID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compara userID": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get many documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1df8397c-599e-4794-b42e-ff785347ea7d",
+  "meta": {
+    "instanceId": "13825b14251b4523b4c6c696ee1fd35cf65637f37ebb80ccdb31ad8ffd57e3e2"
+  },
+  "id": "Av8g1EQscC3xsq3A",
+  "tags": []
+}
